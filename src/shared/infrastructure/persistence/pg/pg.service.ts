@@ -1,33 +1,25 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import {
   Pool,
   type PoolClient,
   type QueryResult,
   type QueryResultRow,
 } from 'pg';
-import { EnvironmentVariables } from 'src/config/env.config';
+import { TypedConfigService } from 'src/config/typed-config.service';
 
 @Injectable()
 export class PgService implements OnModuleInit, OnModuleDestroy {
   private pool: Pool;
 
-  constructor(
-    private readonly configService: ConfigService<EnvironmentVariables, true>,
-  ) {}
+  constructor(private readonly configService: TypedConfigService) {}
 
   async onModuleInit() {
     this.pool = new Pool({
-      connectionString: this.configService.get('DB_URL', { infer: true }),
-      ssl:
-        this.configService.get('SERVICE_ENV', { infer: true }) === 'production',
-      max: this.configService.get('DB_MAX_CONNECTIONS', { infer: true }),
-      idleTimeoutMillis: this.configService.get('DB_IDLE_TIMEOUT', {
-        infer: true,
-      }),
-      connectionTimeoutMillis: this.configService.get('DB_CONNECTION_TIMEOUT', {
-        infer: true,
-      }),
+      connectionString: this.configService.get('DB_URL'),
+      ssl: this.configService.get('SERVICE_ENV') === 'production',
+      max: this.configService.get('DB_MAX_CONNECTIONS'),
+      idleTimeoutMillis: this.configService.get('DB_IDLE_TIMEOUT'),
+      connectionTimeoutMillis: this.configService.get('DB_CONNECTION_TIMEOUT'),
     });
 
     const client = await this.pool.connect();
