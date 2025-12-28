@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { type Response, type Request } from 'express';
 
@@ -17,6 +25,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   async loginLocal(
     @Body() dto: LoginLocalDto,
     @Res({ passthrough: true }) response: Response,
@@ -33,6 +42,7 @@ export class AuthController {
   }
 
   @Post('register')
+  @HttpCode(HttpStatus.CREATED)
   async registerLocal(
     @Body() dto: RegisterLocalDto,
     @Res({ passthrough: true }) response: Response,
@@ -50,6 +60,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @HttpCode(HttpStatus.OK)
   async refreshToken(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
@@ -63,6 +74,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) response: Response): Promise<void> {
     this.cookieAuthService.clear(response);
   }
