@@ -1,4 +1,4 @@
-# VelonY Identity Service
+# VelonY Identity
 
 A microservice handling user authentication and identity management for the VelonY platform.
 
