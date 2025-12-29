@@ -5,9 +5,11 @@ import { v7 as uuidv7 } from 'uuid';
 
 import { UserAvatarPathUpdatedDomainEvent } from '../events/user-avatar-path-updated.domain-event';
 import { UserCreatedDomainEvent } from '../events/user-created.domain-event';
+import { UserEmailUpdatedDomainEvent } from '../events/user-email-updated.domain-event';
 import { UserNameUpdatedDomainEvent } from '../events/user-name-updated.domain-event';
 import { UserPasswordRemovedDomainEvent } from '../events/user-password-removed.domain-event';
 import { UserPasswordUpdatedDomainEvent } from '../events/user-password-updated.domain-event';
+import { UserPhoneNumberUpdatedDomainEvent } from '../events/user-phone-number-updated.domain-event';
 import { UserUsernameUpdatedDomainEvent } from '../events/user-username-updated.domain-event';
 import { InvalidPasswordException } from '../exceptions/invalid-password.exception';
 import { MissingAuthenticationMethodException } from '../exceptions/missing-authentication-method.exception';
@@ -235,6 +237,28 @@ export class UserEntity extends Entity {
     this.addDomainEvent(
       new UserAvatarPathUpdatedDomainEvent(this._id, {
         avatarPath: this._avatarPath.value,
+      }),
+    );
+  }
+
+  public updateEmail(newEmail: Email): void {
+    this._email = newEmail;
+    this._updatedAt = new Date();
+
+    this.addDomainEvent(
+      new UserEmailUpdatedDomainEvent(this._id, {
+        email: this._email.value,
+      }),
+    );
+  }
+
+  public updatePhoneNumber(newPhoneNumber: PhoneNumber): void {
+    this._phoneNumber = newPhoneNumber;
+    this._updatedAt = new Date();
+
+    this.addDomainEvent(
+      new UserPhoneNumberUpdatedDomainEvent(this._id, {
+        phoneNumber: this._phoneNumber.value,
       }),
     );
   }
