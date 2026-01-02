@@ -6,8 +6,8 @@ export declare const DOMAIN_EVENT_BRAND: unique symbol;
 
 export type DomainEventId = string;
 
-export abstract class DomainEvent {
-  private readonly [DOMAIN_EVENT_BRAND]: DomainEvent;
+export abstract class DomainEvent<TPayload = object> {
+  private readonly [DOMAIN_EVENT_BRAND]: DomainEvent<TPayload>;
 
   public constructor(aggregateId: AggregateId) {
     this.id = uuidv7();
@@ -26,4 +26,6 @@ export abstract class DomainEvent {
   public readonly aggregateId: AggregateId;
 
   public readonly occurredAt: Date;
+
+  public readonly payload: TPayload;
 }

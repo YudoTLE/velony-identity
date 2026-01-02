@@ -98,8 +98,8 @@ export class PgUserCommandRepository implements UserCommandRepository {
     const data = PgUserCommandMapper.toPersistence(entity);
 
     try {
-      await this.pgService.transaction(async (client) => {
-        await client.query(
+      await this.pgService.transaction(async () => {
+        await this.pgService.query(
           `
             INSERT INTO users (
               uuid,
@@ -137,7 +137,7 @@ export class PgUserCommandRepository implements UserCommandRepository {
         );
 
         if (data.authentication.local) {
-          await client.query(
+          await this.pgService.query(
             `
               INSERT INTO local_authentications (
                 uuid,
