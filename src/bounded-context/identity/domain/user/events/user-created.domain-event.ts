@@ -1,5 +1,4 @@
-import { DomainEvent } from '@shared-kernel/libs/domain-event';
-import { type AggregateId } from '@shared-kernel/libs/entity';
+import { DomainEvent } from '@velony/domain';
 
 interface Payload {
   name: string;
@@ -10,9 +9,9 @@ interface Payload {
 }
 
 export class UserCreatedDomainEvent extends DomainEvent<Payload> {
-  public static readonly Type = 'UserCreated';
+  public static readonly type = 'UserCreated';
 
-  constructor(aggregateId: AggregateId, payload: Payload) {
+  public constructor(aggregateId: string, payload: Payload) {
     super(aggregateId, payload);
   }
 }

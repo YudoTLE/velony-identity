@@ -1,26 +1,10 @@
-import { v7 as uuidv7 } from 'uuid';
+import { Entity } from '@velony/domain';
 
-import { Entity } from '@shared-kernel/libs/entity';
-import { type AggregateId } from '@shared-kernel/libs/entity';
-
+import { LocalAuthenticationId } from '@identity-domain/user/value-objects/local-authentication-id.vo';
 import { type PasswordHash } from '@identity-domain/user/value-objects/password-hash.vo';
 import { type Password } from '@identity-domain/user/value-objects/password.vo';
 
-export class LocalAuthenticationEntity extends Entity {
-  private constructor(props: {
-    id: AggregateId;
-    passwordHash: PasswordHash;
-    lastUserAt: Date;
-    createdAt: Date;
-    updatedAt: Date;
-  }) {
-    super(props.id);
-    this._passwordHash = props.passwordHash;
-    this._lastUsedAt = props.lastUserAt;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
-  }
-
+export class LocalAuthenticationEntity extends Entity<LocalAuthenticationId> {
   private _passwordHash: PasswordHash;
 
   private _lastUsedAt: Date;
@@ -28,6 +12,20 @@ export class LocalAuthenticationEntity extends Entity {
   private _createdAt: Date;
 
   private _updatedAt: Date;
+
+  private constructor(props: {
+    id?: LocalAuthenticationId;
+    passwordHash: PasswordHash;
+    lastUserAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
+  }) {
+    super(props.id ?? LocalAuthenticationId.create());
+    this._passwordHash = props.passwordHash;
+    this._lastUsedAt = props.lastUserAt;
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
+  }
 
   public get passwordHash(): PasswordHash {
     return this._passwordHash;
@@ -51,7 +49,6 @@ export class LocalAuthenticationEntity extends Entity {
     const now = new Date();
 
     const newUser = new LocalAuthenticationEntity({
-      id: uuidv7(),
       passwordHash: await props.password.toHash(),
       lastUserAt: now,
       createdAt: now,
@@ -62,7 +59,7 @@ export class LocalAuthenticationEntity extends Entity {
   }
 
   public static reconstitute(props: {
-    id: AggregateId;
+    id: LocalAuthenticationId;
     passwordHash: PasswordHash;
     lastUserAt: Date;
     createdAt: Date;

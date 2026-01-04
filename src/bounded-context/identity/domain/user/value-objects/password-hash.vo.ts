@@ -1,6 +1,5 @@
+import { ValueObject } from '@velony/domain';
 import bcrypt from 'bcrypt';
-
-import { ValueObject } from '@shared-kernel/libs/value-object';
 
 import { type Password } from '@identity-domain/user/value-objects/password.vo';
 
@@ -19,13 +18,17 @@ export class PasswordHash extends ValueObject<string> {
 
   public async verify(plain: Password): Promise<boolean> {
     try {
-      return await bcrypt.compare(plain.value, this.value);
+      return await bcrypt.compare(plain.value, this._value);
     } catch {
       return false;
     }
   }
 
-  public equals(other: ValueObject<string>): boolean {
-    return this.value === other.value;
+  public equals(other: this): boolean {
+    return this._value === other._value;
+  }
+
+  public toString(): string {
+    return this._value;
   }
 }

@@ -1,8 +1,4 @@
-import { v7 as uuidv7 } from 'uuid';
-
-import { AggregateRoot } from '@shared-kernel/libs/aggregate-root';
-import { type AggregateId } from '@shared-kernel/libs/entity';
-import { type StoragePath } from '@shared-kernel/value-objects/storage-path.vo';
+import { AggregateRoot, StoragePath } from '@velony/domain';
 
 import { LocalAuthenticationEntity } from '@identity-domain/user/aggregates/local-authentication.entity';
 import { UserAvatarPathUpdatedDomainEvent } from '@identity-domain/user/events/user-avatar-path-updated.domain-event';
@@ -19,38 +15,14 @@ import { type Email } from '@identity-domain/user/value-objects/email.vo';
 import { type Name } from '@identity-domain/user/value-objects/name.vo';
 import { type Password } from '@identity-domain/user/value-objects/password.vo';
 import { type PhoneNumber } from '@identity-domain/user/value-objects/phone-number.vo';
+import { UserId } from '@identity-domain/user/value-objects/user-id.vo';
 import { type Username } from '@identity-domain/user/value-objects/username.vo';
 
 export type UserAuthentication = {
   local?: LocalAuthenticationEntity;
 };
 
-export class UserEntity extends AggregateRoot {
-  private constructor(props: {
-    id: AggregateId;
-    name: Name;
-    username: Username;
-    avatarPath: StoragePath | null;
-    email: Email | null;
-    phoneNumber: PhoneNumber | null;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date | null;
-    authentication: UserAuthentication;
-  }) {
-    super(props.id);
-    this._domainEvents = [];
-    this._name = props.name;
-    this._username = props.username;
-    this._avatarPath = props.avatarPath;
-    this._email = props.email;
-    this._phoneNumber = props.phoneNumber;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
-    this._deletedAt = props.deletedAt;
-    this._authentication = props.authentication;
-  }
-
+export class UserEntity extends AggregateRoot<UserId> {
   private _name: Name;
 
   private _username: Username;
@@ -68,6 +40,42 @@ export class UserEntity extends AggregateRoot {
   private _deletedAt: Date | null;
 
   private _authentication: UserAuthentication;
+
+  private constructor(props: {
+    id?: UserId;
+    name: Name;
+    username: Username;
+    avatarPath: StoragePath | null;
+    email: Email | null;
+    phoneNumber: PhoneNumber | null;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+    authentication: UserAuthentication;
+  }) {
+    super(props.id ?? UserId.create());
+    this._name = props.name;
+    this._username = props.username;
+    this._avatarPath = props.avatarPath;
+    this._email = props.email;
+    this._phoneNumber = props.phoneNumber;
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
+    this._deletedAt = props.deletedAt;
+    this._authentication = props.authentication;
+
+    if (props.id === undefined) {
+      this.pushDomainEvent(
+        new UserCreatedDomainEvent(this._id.value, {
+          name: this._name.value,
+          username: this._username.value,
+          avatarPath: this._avatarPath?.value,
+          email: this._email?.value,
+          phoneNumber: this._phoneNumber?.value,
+        }),
+      );
+    }
+  }
 
   public get name(): Name {
     return this._name;
@@ -113,7 +121,6 @@ export class UserEntity extends AggregateRoot {
     const now = new Date();
 
     const newUser = new UserEntity({
-      id: uuidv7(),
       name: props.name,
       username: props.username,
       avatarPath: null,
@@ -129,21 +136,11 @@ export class UserEntity extends AggregateRoot {
       },
     });
 
-    newUser.pushDomainEvent(
-      new UserCreatedDomainEvent(newUser.id, {
-        name: newUser.name.value,
-        username: newUser.username.value,
-        avatarPath: newUser.avatarPath?.value,
-        email: newUser.email?.value,
-        phoneNumber: newUser.phoneNumber?.value,
-      }),
-    );
-
     return newUser;
   }
 
   public static reconstitute(props: {
-    id: AggregateId;
+    id: UserId;
     name: Name;
     username: Username;
     avatarPath: StoragePath | null;
@@ -162,7 +159,9 @@ export class UserEntity extends AggregateRoot {
     this._updatedAt = new Date();
 
     this.pushDomainEvent(
-      new UserNameUpdatedDomainEvent(this._id, { name: this._name.value }),
+      new UserNameUpdatedDomainEvent(this._id.value, {
+        name: this._name.value,
+      }),
     );
   }
 
@@ -171,7 +170,7 @@ export class UserEntity extends AggregateRoot {
     this._updatedAt = new Date();
 
     this.pushDomainEvent(
-      new UserUsernameUpdatedDomainEvent(this._id, {
+      new UserUsernameUpdatedDomainEvent(this._id.value, {
         username: this._username.value,
       }),
     );
@@ -182,7 +181,7 @@ export class UserEntity extends AggregateRoot {
     this._updatedAt = new Date();
 
     this.pushDomainEvent(
-      new UserAvatarPathUpdatedDomainEvent(this._id, {
+      new UserAvatarPathUpdatedDomainEvent(this._id.value, {
         avatarPath: this._avatarPath.value,
       }),
     );
@@ -193,7 +192,7 @@ export class UserEntity extends AggregateRoot {
     this._updatedAt = new Date();
 
     this.pushDomainEvent(
-      new UserEmailUpdatedDomainEvent(this._id, {
+      new UserEmailUpdatedDomainEvent(this._id.value, {
         email: this._email.value,
       }),
     );
@@ -204,7 +203,7 @@ export class UserEntity extends AggregateRoot {
     this._updatedAt = new Date();
 
     this.pushDomainEvent(
-      new UserPhoneNumberUpdatedDomainEvent(this._id, {
+      new UserPhoneNumberUpdatedDomainEvent(this._id.value, {
         phoneNumber: this._phoneNumber.value,
       }),
     );

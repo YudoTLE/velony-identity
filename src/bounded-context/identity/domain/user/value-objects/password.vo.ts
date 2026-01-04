@@ -1,6 +1,5 @@
+import { ValueObject } from '@velony/domain';
 import bcrypt from 'bcrypt';
-
-import { ValueObject } from '@shared-kernel/libs/value-object';
 
 import { PasswordHash } from '@identity-domain/user/value-objects/password-hash.vo';
 
@@ -33,12 +32,16 @@ export class Password extends ValueObject<string> {
 
   public async toHash(): Promise<PasswordHash> {
     const saltRounds = 12;
-    const passwordHash = await bcrypt.hash(this.value, saltRounds);
+    const passwordHash = await bcrypt.hash(this._value, saltRounds);
 
     return PasswordHash.create(passwordHash);
   }
 
-  public equals(other: ValueObject<string>): boolean {
-    return this.value === other.value;
+  public equals(other: this): boolean {
+    return this._value === other._value;
+  }
+
+  public toString(): string {
+    return this._value;
   }
 }

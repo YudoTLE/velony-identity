@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { type AggregateId } from '@shared-kernel/libs/entity';
-
 import { type UserEntity } from '@identity-domain/user/aggregates/user.entity';
 import { DuplicateEmailException } from '@identity-domain/user/exceptions/duplicate-email.exception';
 import { DuplicatePhoneNumberException } from '@identity-domain/user/exceptions/duplicate-phone-number.exception';
 import { DuplicateUsernameException } from '@identity-domain/user/exceptions/duplicate-username.exception';
 import { UserRepository } from '@identity-domain/user/repositories/user.repository';
+import { type UserId } from '@identity-domain/user/value-objects/user-id.vo';
 import { type Username } from '@identity-domain/user/value-objects/username.vo';
 import { PgUserMapper } from '@identity-infrastructure/persistence/pg/mappers/pg-user.mapper';
 import { PgService } from '@identity-infrastructure/persistence/pg/pg.service';
@@ -15,7 +14,7 @@ import { PgService } from '@identity-infrastructure/persistence/pg/pg.service';
 export class PgUserRepository implements UserRepository {
   public constructor(private readonly pgService: PgService) {}
 
-  public async findById(id: AggregateId): Promise<UserEntity | null> {
+  public async findById(id: UserId): Promise<UserEntity | null> {
     const result = await this.pgService.query(
       `
         SELECT

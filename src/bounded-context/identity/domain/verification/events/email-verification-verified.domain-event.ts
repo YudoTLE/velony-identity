@@ -1,14 +1,13 @@
-import { DomainEvent } from '@shared-kernel/libs/domain-event';
-import { type AggregateId } from '@shared-kernel/libs/entity';
+import { DomainEvent } from '@velony/domain';
 
 interface Payload {
   verifiedAt: Date;
 }
 
 export class EmailVerificationVerifiedDomainEvent extends DomainEvent<Payload> {
-  public static readonly Type = 'EmailVerificationVerified';
+  public static readonly type = 'EmailVerificationVerified';
 
-  constructor(aggregateId: AggregateId, payload: Payload) {
+  public constructor(aggregateId: string, payload: Payload) {
     super(aggregateId, payload);
   }
 }

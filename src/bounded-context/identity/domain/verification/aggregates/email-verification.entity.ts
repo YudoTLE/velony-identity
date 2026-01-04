@@ -1,8 +1,5 @@
-import { v7 as uuidv7 } from 'uuid';
-
-import { type AggregateId } from '@shared-kernel/libs/entity';
-
 import { type Email } from '@identity-domain/user/value-objects/email.vo';
+import { UserId } from '@identity-domain/user/value-objects/user-id.vo';
 import { VerificationEntity } from '@identity-domain/verification/aggregates/base-verification.entity';
 import { type VerificationType } from '@identity-domain/verification/aggregates/base-verification.entity';
 import { EmailVerificationIssuedDomainEvent } from '@identity-domain/verification/events/email-verification-issued.domain-event';
@@ -12,11 +9,14 @@ import { AlreadyVerifiedException } from '@identity-domain/verification/exceptio
 import { ExpiredVerificationException } from '@identity-domain/verification/exceptions/expired-verification.exception';
 import { InvalidVerificationTtlException } from '@identity-domain/verification/exceptions/invalid-verification-ttl.exception';
 import { RevokedVerificationException } from '@identity-domain/verification/exceptions/revoked-verification.exception';
+import { VerificationId } from '@identity-domain/verification/value-objects/user-id.vo';
 
 export class EmailVerificationEntity extends VerificationEntity<Email> {
+  protected _type: VerificationType = 'email';
+
   private constructor(props: {
-    id: AggregateId;
-    userId: AggregateId;
+    id?: VerificationId;
+    userId: UserId;
     token: string;
     value: Email;
     issuedAt: Date;
@@ -24,13 +24,32 @@ export class EmailVerificationEntity extends VerificationEntity<Email> {
     verifiedAt: Date | null;
     revokedAt: Date | null;
   }) {
-    super(props);
+    super({
+      id: props.id ?? VerificationId.create(),
+      userId: props.userId,
+      token: props.token,
+      value: props.value,
+      issuedAt: props.issuedAt,
+      expiresAt: props.expiresAt,
+      verifiedAt: props.verifiedAt,
+      revokedAt: props.revokedAt,
+    });
+
+    if (props.id === undefined) {
+      this.pushDomainEvent(
+        new EmailVerificationIssuedDomainEvent(this._id.value, {
+          userId: this._userId.value,
+          token: this._token,
+          value: this._value.value,
+          issuedAt: this._issuedAt,
+          expiresAt: this._expiresAt,
+        }),
+      );
+    }
   }
 
-  protected _type: VerificationType = 'email';
-
   public static create(props: {
-    userId: AggregateId;
+    userId: UserId;
     token: string;
     value: Email;
     ttl: number;
@@ -42,7 +61,6 @@ export class EmailVerificationEntity extends VerificationEntity<Email> {
     const now = new Date();
 
     const newVerification = new EmailVerificationEntity({
-      id: uuidv7(),
       userId: props.userId,
       token: props.token,
       value: props.value,
@@ -52,22 +70,12 @@ export class EmailVerificationEntity extends VerificationEntity<Email> {
       revokedAt: null,
     });
 
-    newVerification.pushDomainEvent(
-      new EmailVerificationIssuedDomainEvent(newVerification.id, {
-        userId: newVerification.userId,
-        token: newVerification.token,
-        value: newVerification.value.value,
-        issuedAt: newVerification.issuedAt,
-        expiresAt: newVerification.expiresAt,
-      }),
-    );
-
     return newVerification;
   }
 
   public static reconstitute(props: {
-    id: AggregateId;
-    userId: AggregateId;
+    id: VerificationId;
+    userId: UserId;
     token: string;
     value: Email;
     issuedAt: Date;
@@ -94,7 +102,7 @@ export class EmailVerificationEntity extends VerificationEntity<Email> {
     this._verifiedAt = new Date();
 
     this.pushDomainEvent(
-      new EmailVerificationVerifiedDomainEvent(this._id, {
+      new EmailVerificationVerifiedDomainEvent(this._id.value, {
         verifiedAt: this._verifiedAt,
       }),
     );
@@ -116,7 +124,7 @@ export class EmailVerificationEntity extends VerificationEntity<Email> {
     this._revokedAt = new Date();
 
     this.pushDomainEvent(
-      new EmailVerificationRevokedDomainEvent(this._id, {
+      new EmailVerificationRevokedDomainEvent(this._id.value, {
         revokedAt: this._revokedAt,
       }),
     );

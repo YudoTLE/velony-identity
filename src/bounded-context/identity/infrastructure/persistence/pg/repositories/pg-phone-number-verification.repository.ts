@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { type AggregateId } from '@shared-kernel/libs/entity';
-
+import { type UserId } from '@identity-domain/user/value-objects/user-id.vo';
 import { type PhoneNumberVerificationEntity } from '@identity-domain/verification/aggregates/phone-number-verification.entity';
 import { PhoneNumberVerificationRepository } from '@identity-domain/verification/repositories/phone-number-verification.repository';
 import { PgPhoneNumberVerificationMapper } from '@identity-infrastructure/persistence/pg/mappers/pg-phone-number-verification.mapper';
@@ -12,7 +11,7 @@ export class PgPhoneNumberVerificationRepository implements PhoneNumberVerificat
   public constructor(private readonly pgService: PgService) {}
 
   public async findByUserId(
-    userId: AggregateId,
+    userId: UserId,
   ): Promise<PhoneNumberVerificationEntity | null> {
     const result = await this.pgService.query(
       `

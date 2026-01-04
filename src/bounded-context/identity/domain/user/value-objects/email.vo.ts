@@ -1,4 +1,4 @@
-import { ValueObject } from '@shared-kernel/libs/value-object';
+import { ValueObject } from '@velony/domain';
 
 export class Email extends ValueObject<string> {
   private constructor(value: string) {
@@ -20,14 +20,18 @@ export class Email extends ValueObject<string> {
   }
 
   public get local(): string {
-    return this.value.split('@')[0];
+    return this._value.split('@')[0];
   }
 
   public get domain(): string {
-    return this.value.split('@')[1];
+    return this._value.split('@')[1];
   }
 
-  public equals(other: ValueObject<string>): boolean {
-    return this.value === other.value;
+  public equals(other: this): boolean {
+    return this._value === other._value;
+  }
+
+  public toString(): string {
+    return this._value;
   }
 }

@@ -1,10 +1,8 @@
-import { DomainEvent } from '@shared-kernel/libs/domain-event';
-import { type AggregateId } from '@shared-kernel/libs/entity';
+import { DomainEvent } from '@velony/domain';
 
-export class UserPasswordUpdatedDomainEvent extends DomainEvent {
-  public static readonly Type = 'UserPasswordUpdated';
-
-  constructor(aggregateId: AggregateId) {
-    super(aggregateId, null);
+export class UserPasswordUpdatedDomainEvent extends DomainEvent<void> {
+  public static readonly type = 'UserPasswordUpdated';
+  public constructor(aggregateId: string) {
+    super(aggregateId);
   }
 }

@@ -1,37 +1,18 @@
 import { timingSafeEqual } from 'crypto';
 
-import { AggregateRoot } from '@shared-kernel/libs/aggregate-root';
-import { type AggregateId } from '@shared-kernel/libs/entity';
-import { type ValueObject } from '@shared-kernel/libs/value-object';
+import { AggregateRoot, ValueObject } from '@velony/domain';
+
+import { UserId } from '@identity-domain/user/value-objects/user-id.vo';
+import { VerificationId } from '@identity-domain/verification/value-objects/user-id.vo';
 
 export type VerificationType = 'email' | 'phone_number';
 
 export abstract class VerificationEntity<
   TValue extends ValueObject<string> = ValueObject<string>,
-> extends AggregateRoot {
-  protected constructor(props: {
-    id: AggregateId;
-    userId: AggregateId;
-    token: string;
-    value: TValue;
-    issuedAt: Date;
-    expiresAt: Date;
-    verifiedAt: Date | null;
-    revokedAt: Date | null;
-  }) {
-    super(props.id);
-    this._userId = props.userId;
-    this._token = props.token;
-    this._value = props.value;
-    this._issuedAt = props.issuedAt;
-    this._expiresAt = props.expiresAt;
-    this._verifiedAt = props.verifiedAt;
-    this._revokedAt = props.revokedAt;
-  }
-
+> extends AggregateRoot<VerificationId> {
   protected abstract _type: VerificationType;
 
-  protected _userId: AggregateId;
+  protected _userId: UserId;
 
   protected _token: string;
 
@@ -45,11 +26,31 @@ export abstract class VerificationEntity<
 
   protected _revokedAt: Date | null;
 
+  protected constructor(props: {
+    id: VerificationId;
+    userId: UserId;
+    token: string;
+    value: TValue;
+    issuedAt: Date;
+    expiresAt: Date;
+    verifiedAt: Date | null;
+    revokedAt: Date | null;
+  }) {
+    super(props.id ?? VerificationId.create());
+    this._userId = props.userId;
+    this._token = props.token;
+    this._value = props.value;
+    this._issuedAt = props.issuedAt;
+    this._expiresAt = props.expiresAt;
+    this._verifiedAt = props.verifiedAt;
+    this._revokedAt = props.revokedAt;
+  }
+
   public get type(): VerificationType {
     return this._type;
   }
 
-  public get userId(): AggregateId {
+  public get userId(): UserId {
     return this._userId;
   }
 

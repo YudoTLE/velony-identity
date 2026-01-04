@@ -1,8 +1,5 @@
-import { v7 as uuidv7 } from 'uuid';
-
-import { type AggregateId } from '@shared-kernel/libs/entity';
-
 import { type PhoneNumber } from '@identity-domain/user/value-objects/phone-number.vo';
+import { UserId } from '@identity-domain/user/value-objects/user-id.vo';
 import { VerificationEntity } from '@identity-domain/verification/aggregates/base-verification.entity';
 import { type VerificationType } from '@identity-domain/verification/aggregates/base-verification.entity';
 import { PhoneNumberVerificationIssuedDomainEvent } from '@identity-domain/verification/events/phone-number-verification-issued.domain-event';
@@ -12,11 +9,14 @@ import { AlreadyVerifiedException } from '@identity-domain/verification/exceptio
 import { ExpiredVerificationException } from '@identity-domain/verification/exceptions/expired-verification.exception';
 import { InvalidVerificationTtlException } from '@identity-domain/verification/exceptions/invalid-verification-ttl.exception';
 import { RevokedVerificationException } from '@identity-domain/verification/exceptions/revoked-verification.exception';
+import { VerificationId } from '@identity-domain/verification/value-objects/user-id.vo';
 
 export class PhoneNumberVerificationEntity extends VerificationEntity<PhoneNumber> {
+  protected _type: VerificationType = 'phone_number';
+
   private constructor(props: {
-    id: AggregateId;
-    userId: AggregateId;
+    id?: VerificationId;
+    userId: UserId;
     token: string;
     value: PhoneNumber;
     issuedAt: Date;
@@ -24,13 +24,32 @@ export class PhoneNumberVerificationEntity extends VerificationEntity<PhoneNumbe
     verifiedAt: Date | null;
     revokedAt: Date | null;
   }) {
-    super(props);
+    super({
+      id: props.id ?? VerificationId.create(),
+      userId: props.userId,
+      token: props.token,
+      value: props.value,
+      issuedAt: props.issuedAt,
+      expiresAt: props.expiresAt,
+      verifiedAt: props.verifiedAt,
+      revokedAt: props.revokedAt,
+    });
+
+    if (props.id === undefined) {
+      this.pushDomainEvent(
+        new PhoneNumberVerificationIssuedDomainEvent(this._id.value, {
+          userId: this._userId.value,
+          token: this._token,
+          value: this._value.toString(),
+          issuedAt: this._issuedAt,
+          expiresAt: this._expiresAt,
+        }),
+      );
+    }
   }
 
-  protected _type: VerificationType = 'phone_number';
-
   public static create(props: {
-    userId: AggregateId;
+    userId: UserId;
     token: string;
     value: PhoneNumber;
     ttl: number;
@@ -42,7 +61,6 @@ export class PhoneNumberVerificationEntity extends VerificationEntity<PhoneNumbe
     const now = new Date();
 
     const newVerification = new PhoneNumberVerificationEntity({
-      id: uuidv7(),
       userId: props.userId,
       token: props.token,
       value: props.value,
@@ -52,22 +70,12 @@ export class PhoneNumberVerificationEntity extends VerificationEntity<PhoneNumbe
       revokedAt: null,
     });
 
-    newVerification.pushDomainEvent(
-      new PhoneNumberVerificationIssuedDomainEvent(newVerification.id, {
-        userId: newVerification.userId,
-        token: newVerification.token,
-        value: newVerification.value.value,
-        issuedAt: newVerification.issuedAt,
-        expiresAt: newVerification.expiresAt,
-      }),
-    );
-
     return newVerification;
   }
 
   public static reconstitute(props: {
-    id: AggregateId;
-    userId: AggregateId;
+    id: VerificationId;
+    userId: UserId;
     token: string;
     value: PhoneNumber;
     issuedAt: Date;
@@ -94,7 +102,7 @@ export class PhoneNumberVerificationEntity extends VerificationEntity<PhoneNumbe
     this._verifiedAt = new Date();
 
     this.pushDomainEvent(
-      new PhoneNumberVerificationVerifiedDomainEvent(this._id, {
+      new PhoneNumberVerificationVerifiedDomainEvent(this._id.value, {
         verifiedAt: this._verifiedAt,
       }),
     );
@@ -116,7 +124,7 @@ export class PhoneNumberVerificationEntity extends VerificationEntity<PhoneNumbe
     this._revokedAt = new Date();
 
     this.pushDomainEvent(
-      new PhoneNumberVerificationRevokedDomainEvent(this._id, {
+      new PhoneNumberVerificationRevokedDomainEvent(this._id.value, {
         revokedAt: this._revokedAt,
       }),
     );

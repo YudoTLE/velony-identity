@@ -1,5 +1,7 @@
 import { Email } from '@identity-domain/user/value-objects/email.vo';
+import { UserId } from '@identity-domain/user/value-objects/user-id.vo';
 import { EmailVerificationEntity } from '@identity-domain/verification/aggregates/email-verification.entity';
+import { VerificationId } from '@identity-domain/verification/value-objects/user-id.vo';
 
 type EmailVerificationPersistence = {
   id: string;
@@ -18,8 +20,8 @@ export class PgEmailVerificationMapper {
     persistence: EmailVerificationPersistence,
   ): EmailVerificationEntity {
     return EmailVerificationEntity.reconstitute({
-      id: persistence.id,
-      userId: persistence.userId,
+      id: VerificationId.create(persistence.id),
+      userId: UserId.create(persistence.userId),
       token: persistence.token,
       value: Email.create(persistence.value),
       issuedAt: persistence.issuedAt,
@@ -33,8 +35,8 @@ export class PgEmailVerificationMapper {
     entity: EmailVerificationEntity,
   ): EmailVerificationPersistence {
     return {
-      id: entity.id,
-      userId: entity.userId,
+      id: entity.id.value,
+      userId: entity.userId.value,
       token: entity.token,
       type: 'email',
       value: entity.value.value,

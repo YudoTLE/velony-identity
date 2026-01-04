@@ -1,14 +1,13 @@
-import { DomainEvent } from '@shared-kernel/libs/domain-event';
-import { type AggregateId } from '@shared-kernel/libs/entity';
+import { DomainEvent } from '@velony/domain';
 
 interface Payload {
   avatarPath: string;
 }
 
 export class UserAvatarPathUpdatedDomainEvent extends DomainEvent<Payload> {
-  public static readonly Type = 'UserAvatarPathUpdated';
+  public static readonly type = 'UserAvatarPathUpdated';
 
-  constructor(aggregateId: AggregateId, payload: Payload) {
+  public constructor(aggregateId: string, payload: Payload) {
     super(aggregateId, payload);
   }
 }

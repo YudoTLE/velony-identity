@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { type AggregateId } from '@shared-kernel/libs/entity';
-
+import { type UserId } from '@identity-domain/user/value-objects/user-id.vo';
 import { type EmailVerificationEntity } from '@identity-domain/verification/aggregates/email-verification.entity';
 import { EmailVerificationRepository } from '@identity-domain/verification/repositories/email-verification.repository';
 import { PgEmailVerificationMapper } from '@identity-infrastructure/persistence/pg/mappers/pg-email-verification.mapper';
@@ -12,7 +11,7 @@ export class PgEmailVerificationRepository implements EmailVerificationRepositor
   public constructor(private readonly pgService: PgService) {}
 
   public async findByUserId(
-    userId: AggregateId,
+    userId: UserId,
   ): Promise<EmailVerificationEntity | null> {
     const result = await this.pgService.query(
       `

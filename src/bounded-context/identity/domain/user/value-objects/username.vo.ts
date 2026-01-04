@@ -1,4 +1,4 @@
-import { ValueObject } from '@shared-kernel/libs/value-object';
+import { ValueObject } from '@velony/domain';
 
 export class Username extends ValueObject<string> {
   private constructor(value: string) {
@@ -21,7 +21,11 @@ export class Username extends ValueObject<string> {
     return new Username(value);
   }
 
-  public equals(other: ValueObject<string>): boolean {
-    return this.value === other.value;
+  public equals(other: this): boolean {
+    return this._value === other._value;
+  }
+
+  public toString(): string {
+    return this._value;
   }
 }

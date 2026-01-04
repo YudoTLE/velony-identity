@@ -1,7 +1,6 @@
+import { ValueObject } from '@velony/domain';
 import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import { type CountryCode, type NationalNumber } from 'libphonenumber-js';
-
-import { ValueObject } from '@shared-kernel/libs/value-object';
 
 export class PhoneNumber extends ValueObject<string> {
   private readonly parsed: ReturnType<typeof parsePhoneNumberWithError>;
@@ -39,7 +38,11 @@ export class PhoneNumber extends ValueObject<string> {
     return this.parsed.nationalNumber;
   }
 
-  public equals(other: ValueObject<string>): boolean {
-    return this.value === other.value;
+  public equals(other: this): boolean {
+    return this._value === other._value;
+  }
+
+  public toString(): string {
+    return this._value;
   }
 }
