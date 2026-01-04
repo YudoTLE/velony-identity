@@ -52,7 +52,7 @@ export class EmailVerificationEntity extends VerificationEntity<Email> {
       revokedAt: null,
     });
 
-    newVerification.addDomainEvent(
+    newVerification.pushDomainEvent(
       new EmailVerificationIssuedDomainEvent(newVerification.id, {
         userId: newVerification.userId,
         token: newVerification.token,
@@ -93,7 +93,7 @@ export class EmailVerificationEntity extends VerificationEntity<Email> {
 
     this._verifiedAt = new Date();
 
-    this.addDomainEvent(
+    this.pushDomainEvent(
       new EmailVerificationVerifiedDomainEvent(this._id, {
         verifiedAt: this._verifiedAt,
       }),
@@ -115,7 +115,7 @@ export class EmailVerificationEntity extends VerificationEntity<Email> {
 
     this._revokedAt = new Date();
 
-    this.addDomainEvent(
+    this.pushDomainEvent(
       new EmailVerificationRevokedDomainEvent(this._id, {
         revokedAt: this._revokedAt,
       }),

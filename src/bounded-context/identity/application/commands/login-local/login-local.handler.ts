@@ -3,7 +3,7 @@ import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 import { LoginLocalCommand } from '@identity-application/commands/login-local/login-local.command';
 import { InvalidUsernameOrPasswordException } from '@identity-application/exceptions/invalid-username-or-password.exception';
 import { TokenService } from '@identity-application/services/token.service';
-import { UserRepository } from '@identity-domain/user/repositories/user.command.repository';
+import { UserRepository } from '@identity-domain/user/repositories/user.repository';
 import { Password } from '@identity-domain/user/value-objects/password.vo';
 import { Username } from '@identity-domain/user/value-objects/username.vo';
 

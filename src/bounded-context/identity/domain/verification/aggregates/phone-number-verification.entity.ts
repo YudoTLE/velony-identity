@@ -52,7 +52,7 @@ export class PhoneNumberVerificationEntity extends VerificationEntity<PhoneNumbe
       revokedAt: null,
     });
 
-    newVerification.addDomainEvent(
+    newVerification.pushDomainEvent(
       new PhoneNumberVerificationIssuedDomainEvent(newVerification.id, {
         userId: newVerification.userId,
         token: newVerification.token,
@@ -93,7 +93,7 @@ export class PhoneNumberVerificationEntity extends VerificationEntity<PhoneNumbe
 
     this._verifiedAt = new Date();
 
-    this.addDomainEvent(
+    this.pushDomainEvent(
       new PhoneNumberVerificationVerifiedDomainEvent(this._id, {
         verifiedAt: this._verifiedAt,
       }),
@@ -115,7 +115,7 @@ export class PhoneNumberVerificationEntity extends VerificationEntity<PhoneNumbe
 
     this._revokedAt = new Date();
 
-    this.addDomainEvent(
+    this.pushDomainEvent(
       new PhoneNumberVerificationRevokedDomainEvent(this._id, {
         revokedAt: this._revokedAt,
       }),

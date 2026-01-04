@@ -1,7 +1,6 @@
 import { timingSafeEqual } from 'crypto';
 
-import { type DomainEvent } from '@shared-kernel/libs/domain-event';
-import { Entity } from '@shared-kernel/libs/entity';
+import { AggregateRoot } from '@shared-kernel/libs/aggregate-root';
 import { type AggregateId } from '@shared-kernel/libs/entity';
 import { type ValueObject } from '@shared-kernel/libs/value-object';
 
@@ -9,7 +8,7 @@ export type VerificationType = 'email' | 'phone_number';
 
 export abstract class VerificationEntity<
   TValue extends ValueObject<string> = ValueObject<string>,
-> extends Entity {
+> extends AggregateRoot {
   protected constructor(props: {
     id: AggregateId;
     userId: AggregateId;
@@ -21,7 +20,6 @@ export abstract class VerificationEntity<
     revokedAt: Date | null;
   }) {
     super(props.id);
-    this._domainEvents = [];
     this._userId = props.userId;
     this._token = props.token;
     this._value = props.value;
@@ -30,8 +28,6 @@ export abstract class VerificationEntity<
     this._verifiedAt = props.verifiedAt;
     this._revokedAt = props.revokedAt;
   }
-
-  protected _domainEvents: DomainEvent[];
 
   protected abstract _type: VerificationType;
 
@@ -79,18 +75,6 @@ export abstract class VerificationEntity<
 
   public get revokedAt(): Date | null {
     return this._revokedAt;
-  }
-
-  public getDomainEvents(): DomainEvent[] {
-    return [...this._domainEvents];
-  }
-
-  public clearDomainEvents(): void {
-    this._domainEvents = [];
-  }
-
-  protected addDomainEvent(event: DomainEvent): void {
-    this._domainEvents.push(event);
   }
 
   public isExpired(): boolean {

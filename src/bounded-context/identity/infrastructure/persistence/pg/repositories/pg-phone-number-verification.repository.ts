@@ -2,22 +2,18 @@ import { Injectable } from '@nestjs/common';
 
 import { type AggregateId } from '@shared-kernel/libs/entity';
 
-import {
-  type VerificationEntity,
-  type VerificationType,
-} from '@identity-domain/verification/aggregates/base-verification.entity';
-import { VerificationRepository } from '@identity-domain/verification/repositories/verification.repository';
-import { PgVerificationMapper } from '@identity-infrastructure/persistence/pg/mappers/pg-verification.mapper';
+import { type PhoneNumberVerificationEntity } from '@identity-domain/verification/aggregates/phone-number-verification.entity';
+import { PhoneNumberVerificationRepository } from '@identity-domain/verification/repositories/phone-number-verification.repository';
+import { PgPhoneNumberVerificationMapper } from '@identity-infrastructure/persistence/pg/mappers/pg-phone-number-verification.mapper';
 import { PgService } from '@identity-infrastructure/persistence/pg/pg.service';
 
 @Injectable()
-export class PgVerificationRepository implements VerificationRepository {
+export class PgPhoneNumberVerificationRepository implements PhoneNumberVerificationRepository {
   public constructor(private readonly pgService: PgService) {}
 
   public async findByUserId(
     userId: AggregateId,
-    type: VerificationType,
-  ): Promise<VerificationEntity | null> {
+  ): Promise<PhoneNumberVerificationEntity | null> {
     const result = await this.pgService.query(
       `
         SELECT
@@ -34,21 +30,23 @@ export class PgVerificationRepository implements VerificationRepository {
           ) as verification
         FROM verifications v
         WHERE v.user_id = $1
-          AND v.type = $2
+          AND v.type = 'phone_number'
           AND v.verified_at IS NULL
           AND v.revoked_at IS NULL
         ORDER BY v.issued_at DESC
         LIMIT 1
       `,
-      [userId, type],
+      [userId],
     );
     if (!result.rows.at(0)) return null;
 
-    return PgVerificationMapper.toEntity(result.rows[0].verification);
+    return PgPhoneNumberVerificationMapper.toEntity(
+      result.rows[0].verification,
+    );
   }
 
-  public async save(entity: VerificationEntity): Promise<void> {
-    const data = PgVerificationMapper.toPersistence(entity);
+  public async save(entity: PhoneNumberVerificationEntity): Promise<void> {
+    const data = PgPhoneNumberVerificationMapper.toPersistence(entity);
 
     await this.pgService.query(
       `

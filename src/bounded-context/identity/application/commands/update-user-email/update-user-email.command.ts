@@ -1,11 +1,12 @@
 import { Command } from '@shared-kernel/libs/command';
+import { type AggregateId } from '@shared-kernel/libs/entity';
 
 type Props = {
-  email: string;
+  token: string;
 };
 
 type Context = {
-  userId: string;
+  userId: AggregateId;
 };
 
 export class UpdateUserEmailCommand extends Command<Props, Context> {

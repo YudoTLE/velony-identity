@@ -1,7 +1,6 @@
 import { v7 as uuidv7 } from 'uuid';
 
-import { type DomainEvent } from '@shared-kernel/libs/domain-event';
-import { Entity } from '@shared-kernel/libs/entity';
+import { AggregateRoot } from '@shared-kernel/libs/aggregate-root';
 import { type AggregateId } from '@shared-kernel/libs/entity';
 import { type StoragePath } from '@shared-kernel/value-objects/storage-path.vo';
 
@@ -26,7 +25,7 @@ export type UserAuthentication = {
   local?: LocalAuthenticationEntity;
 };
 
-export class UserEntity extends Entity {
+export class UserEntity extends AggregateRoot {
   private constructor(props: {
     id: AggregateId;
     name: Name;
@@ -51,7 +50,6 @@ export class UserEntity extends Entity {
     this._deletedAt = props.deletedAt;
     this._authentication = props.authentication;
   }
-  private _domainEvents: DomainEvent[];
 
   private _name: Name;
 
@@ -107,18 +105,6 @@ export class UserEntity extends Entity {
     return Object.freeze(this._authentication);
   }
 
-  public getDomainEvents(): DomainEvent[] {
-    return [...this._domainEvents];
-  }
-
-  public clearDomainEvents(): void {
-    this._domainEvents = [];
-  }
-
-  private addDomainEvent(event: DomainEvent): void {
-    this._domainEvents.push(event);
-  }
-
   public static async registerLocal(props: {
     name: Name;
     username: Username;
@@ -143,7 +129,7 @@ export class UserEntity extends Entity {
       },
     });
 
-    newUser.addDomainEvent(
+    newUser.pushDomainEvent(
       new UserCreatedDomainEvent(newUser.id, {
         name: newUser.name.value,
         username: newUser.username.value,
@@ -175,7 +161,7 @@ export class UserEntity extends Entity {
     this._name = newName;
     this._updatedAt = new Date();
 
-    this.addDomainEvent(
+    this.pushDomainEvent(
       new UserNameUpdatedDomainEvent(this._id, { name: this._name.value }),
     );
   }
@@ -184,7 +170,7 @@ export class UserEntity extends Entity {
     this._username = newUsername;
     this._updatedAt = new Date();
 
-    this.addDomainEvent(
+    this.pushDomainEvent(
       new UserUsernameUpdatedDomainEvent(this._id, {
         username: this._username.value,
       }),
@@ -195,7 +181,7 @@ export class UserEntity extends Entity {
     this._avatarPath = newAvatarPath;
     this._updatedAt = new Date();
 
-    this.addDomainEvent(
+    this.pushDomainEvent(
       new UserAvatarPathUpdatedDomainEvent(this._id, {
         avatarPath: this._avatarPath.value,
       }),
@@ -206,7 +192,7 @@ export class UserEntity extends Entity {
     this._email = newEmail;
     this._updatedAt = new Date();
 
-    this.addDomainEvent(
+    this.pushDomainEvent(
       new UserEmailUpdatedDomainEvent(this._id, {
         email: this._email.value,
       }),
@@ -217,7 +203,7 @@ export class UserEntity extends Entity {
     this._phoneNumber = newPhoneNumber;
     this._updatedAt = new Date();
 
-    this.addDomainEvent(
+    this.pushDomainEvent(
       new UserPhoneNumberUpdatedDomainEvent(this._id, {
         phoneNumber: this._phoneNumber.value,
       }),
