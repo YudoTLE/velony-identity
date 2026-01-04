@@ -6,7 +6,7 @@ export type OutboxPersistence<TPayload = null> = {
   eventType: string;
   aggregateId: string;
   payload: TPayload;
-  createdAt: Date;
+  enqueuedAt: Date;
 };
 
 export abstract class PersistenceService {
@@ -14,11 +14,11 @@ export abstract class PersistenceService {
     callback: () => Promise<TResult>,
   ): Promise<TResult>;
 
-  public abstract saveToOutbox<TPayload>(
+  public abstract enqueueToOutbox<TPayload>(
     events: DomainEvent<TPayload>[],
   ): Promise<void>;
 
-  public abstract processOutbox<TPayload>(
+  public abstract dispatchOutbox<TPayload>(
     handler: (outboxes: OutboxPersistence<TPayload>[]) => Promise<void>,
   ): Promise<void>;
 }

@@ -94,7 +94,7 @@ export class PgService
     }
   }
 
-  public async saveToOutbox<TPayload>(
+  public async enqueueToOutbox<TPayload>(
     events: DomainEvent<TPayload>[],
   ): Promise<void> {
     if (events.length === 0) return;
@@ -120,7 +120,7 @@ export class PgService
     );
   }
 
-  public async processOutbox<TPayload>(
+  public async dispatchOutbox<TPayload>(
     handler: (outboxes: OutboxPersistence<TPayload>[]) => Promise<void>,
   ): Promise<void> {
     await this.transaction(async () => {
@@ -132,9 +132,9 @@ export class PgService
             o.event_type AS "eventType",
             o.aggregate_id AS "aggregateId",
             o.payload AS "payload",
-            o.created_at AS "createdAt"
+            o.enqueued_at AS "enqueuedAt"
           FROM outbox o
-          WHERE o.processed_at IS NULL
+          WHERE o.dispatched_at IS NULL
           ORDER BY o.id ASC
           LIMIT 100
           FOR UPDATE SKIP LOCKED
@@ -149,7 +149,7 @@ export class PgService
       await this.query(
         `
           UPDATE outbox
-          SET processed_at = NOW()
+          SET dispatched_at = NOW()
           WHERE id = ANY($1)
         `,
         [ids],
