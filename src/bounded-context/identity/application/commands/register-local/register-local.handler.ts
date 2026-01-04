@@ -4,7 +4,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RegisterLocalCommand } from '@identity-application/commands/register-local/register-local.command';
 import { TokenService } from '@identity-application/services/token.service';
 import { UserEntity } from '@identity-domain/user/aggregates/user.entity';
-import { UserCommandRepository } from '@identity-domain/user/repositories/user.command.repository';
+import { UserRepository } from '@identity-domain/user/repositories/user.command.repository';
 import { Name } from '@identity-domain/user/value-objects/name.vo';
 import { Password } from '@identity-domain/user/value-objects/password.vo';
 import { Username } from '@identity-domain/user/value-objects/username.vo';
@@ -12,7 +12,7 @@ import { Username } from '@identity-domain/user/value-objects/username.vo';
 @CommandHandler(RegisterLocalCommand)
 export class RegisterLocalHandler implements ICommandHandler<RegisterLocalCommand> {
   constructor(
-    private readonly userCommandRepository: UserCommandRepository,
+    private readonly userRepository: UserRepository,
     private readonly tokenService: TokenService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
@@ -24,7 +24,7 @@ export class RegisterLocalHandler implements ICommandHandler<RegisterLocalComman
       password: Password.create(command.props.password),
     });
 
-    await this.userCommandRepository.save(user);
+    await this.userRepository.save(user);
 
     const domainEvents = user.getDomainEvents();
     for (const event of domainEvents) {

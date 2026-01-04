@@ -6,13 +6,13 @@ import { type UserEntity } from '@identity-domain/user/aggregates/user.entity';
 import { DuplicateEmailException } from '@identity-domain/user/exceptions/duplicate-email.exception';
 import { DuplicatePhoneNumberException } from '@identity-domain/user/exceptions/duplicate-phone-number.exception';
 import { DuplicateUsernameException } from '@identity-domain/user/exceptions/duplicate-username.exception';
-import { UserCommandRepository } from '@identity-domain/user/repositories/user.command.repository';
+import { UserRepository } from '@identity-domain/user/repositories/user.repository';
 import { type Username } from '@identity-domain/user/value-objects/username.vo';
-import { PgUserCommandMapper } from '@identity-infrastructure/persistence/pg/mappers/pg-user.command.mapper';
+import { PgUserMapper } from '@identity-infrastructure/persistence/pg/mappers/pg-user.mapper';
 import { PgService } from '@identity-infrastructure/persistence/pg/pg.service';
 
 @Injectable()
-export class PgUserCommandRepository implements UserCommandRepository {
+export class PgUserRepository implements UserRepository {
   public constructor(private readonly pgService: PgService) {}
 
   public async findById(id: AggregateId): Promise<UserEntity | null> {
@@ -52,7 +52,7 @@ export class PgUserCommandRepository implements UserCommandRepository {
 
     if (!result.rows.at(0)) return null;
 
-    return PgUserCommandMapper.toEntity(result.rows[0].user);
+    return PgUserMapper.toEntity(result.rows[0].user);
   }
 
   public async findByUsername(username: Username): Promise<UserEntity | null> {
@@ -91,11 +91,11 @@ export class PgUserCommandRepository implements UserCommandRepository {
     );
     if (!result.rows.at(0)) return null;
 
-    return PgUserCommandMapper.toEntity(result.rows[0].user);
+    return PgUserMapper.toEntity(result.rows[0].user);
   }
 
   public async save(entity: UserEntity): Promise<void> {
-    const data = PgUserCommandMapper.toPersistence(entity);
+    const data = PgUserMapper.toPersistence(entity);
 
     try {
       await this.pgService.transaction(async () => {

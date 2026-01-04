@@ -31,7 +31,7 @@ type UserPersistence = {
   };
 };
 
-export class PgUserCommandMapper {
+export class PgUserMapper {
   public static toEntity(persistence: UserPersistence): UserEntity {
     return UserEntity.reconstitute({
       id: persistence.id,

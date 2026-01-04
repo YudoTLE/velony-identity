@@ -3,18 +3,18 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { UpdateUserPasswordCommand } from '@identity-application/commands/update-user-password/update-user-password.command';
 import { UserNotFoundException } from '@identity-domain/user/exceptions/user-not-found.exception';
-import { UserCommandRepository } from '@identity-domain/user/repositories/user.command.repository';
+import { UserRepository } from '@identity-domain/user/repositories/user.command.repository';
 import { Password } from '@identity-domain/user/value-objects/password.vo';
 
 @CommandHandler(UpdateUserPasswordCommand)
 export class UpdateUserPasswordHandler implements ICommandHandler<UpdateUserPasswordCommand> {
   constructor(
-    private readonly userCommandRepository: UserCommandRepository,
+    private readonly userRepository: UserRepository,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(command: UpdateUserPasswordCommand): Promise<void> {
-    const user = await this.userCommandRepository.findById(
+    const user = await this.userRepository.findById(
       command.context.userId,
     );
     if (!user) {
@@ -26,7 +26,7 @@ export class UpdateUserPasswordHandler implements ICommandHandler<UpdateUserPass
       Password.create(command.props.password),
     );
 
-    await this.userCommandRepository.save(user);
+    await this.userRepository.save(user);
 
     const domainEvents = user.getDomainEvents();
     for (const event of domainEvents) {

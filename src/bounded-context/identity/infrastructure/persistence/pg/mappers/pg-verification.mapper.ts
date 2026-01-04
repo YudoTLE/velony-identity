@@ -19,7 +19,7 @@ type VerificationPersistence = {
   revokedAt: Date | null;
 };
 
-export class PgVerificationCommandMapper {
+export class PgVerificationMapper {
   public static toEntity(
     persistence: VerificationPersistence,
   ): VerificationEntity {

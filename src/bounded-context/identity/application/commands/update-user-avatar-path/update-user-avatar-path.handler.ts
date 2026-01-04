@@ -5,17 +5,17 @@ import { StoragePath } from '@shared-kernel/value-objects/storage-path.vo';
 
 import { UpdateUserAvatarPathCommand } from '@identity-application/commands/update-user-avatar-path/update-user-avatar-path.command';
 import { UserNotFoundException } from '@identity-domain/user/exceptions/user-not-found.exception';
-import { UserCommandRepository } from '@identity-domain/user/repositories/user.command.repository';
+import { UserRepository } from '@identity-domain/user/repositories/user.command.repository';
 
 @CommandHandler(UpdateUserAvatarPathCommand)
 export class UpdateUserAvatarPathHandler implements ICommandHandler<UpdateUserAvatarPathCommand> {
   constructor(
-    private readonly userCommandRepository: UserCommandRepository,
+    private readonly userRepository: UserRepository,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(command: UpdateUserAvatarPathCommand): Promise<void> {
-    const user = await this.userCommandRepository.findById(
+    const user = await this.userRepository.findById(
       command.context.userId,
     );
     if (!user) {
@@ -24,7 +24,7 @@ export class UpdateUserAvatarPathHandler implements ICommandHandler<UpdateUserAv
 
     user.updateAvatarPath(StoragePath.create(command.props.avatarPath));
 
-    await this.userCommandRepository.save(user);
+    await this.userRepository.save(user);
 
     const domainEvents = user.getDomainEvents();
     for (const event of domainEvents) {

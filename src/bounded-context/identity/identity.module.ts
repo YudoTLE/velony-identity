@@ -17,8 +17,8 @@ import { UpdateUserPhoneNumberHandler } from '@identity-application/commands/upd
 import { UpdateUserUsernameHandler } from '@identity-application/commands/update-user-username/update-user-username.handler';
 import { VerifyEmailHandler } from '@identity-application/commands/verify-email-verification/verify-email-verification.handler';
 import { TokenService } from '@identity-application/services/token.service';
-import { UserCommandRepository } from '@identity-domain/user/repositories/user.command.repository';
-import { VerificationCommandRepository } from '@identity-domain/verification/repositories/verification.command.repository';
+import { UserRepository } from '@identity-domain/user/repositories/user.repository';
+import { VerificationRepository } from '@identity-domain/verification/repositories/verification.repository';
 import { EmailVerificationIssuedEventHandler } from '@identity-infrastructure/events-handlers/email-verification-issued.event-handler';
 import { EmailVerificationVerifiedEventHandler } from '@identity-infrastructure/events-handlers/email-verification-verified.event-handler';
 import { UserAvatarPathUpdatedEventHandler } from '@identity-infrastructure/events-handlers/user-avatar-path-updated.event-handler';
@@ -33,8 +33,8 @@ import { AuthController } from '@identity-infrastructure/http/controllers/auth.c
 import { UserController } from '@identity-infrastructure/http/controllers/user.controller';
 import { KafkaModule } from '@identity-infrastructure/messaging/kafka/kafka.module';
 import { PgModule } from '@identity-infrastructure/persistence/pg/pg.module';
-import { PgUserCommandRepository } from '@identity-infrastructure/persistence/pg/repositories/pg-user.command.repository';
-import { PgVerificationCommandRepository } from '@identity-infrastructure/persistence/pg/repositories/pg-verification.command.repository';
+import { PgUserRepository } from '@identity-infrastructure/persistence/pg/repositories/pg-user.repository';
+import { PgVerificationRepository } from '@identity-infrastructure/persistence/pg/repositories/pg-verification.repository';
 import { CookieAuthService } from '@identity-infrastructure/services/cookie-auth.service';
 import { JwtTokenService } from '@identity-infrastructure/services/jwt-token.service';
 import { S3Module } from '@identity-infrastructure/storage/s3/s3.module';
@@ -71,12 +71,12 @@ const Controllers = [AuthController, UserController];
 
 const Repositories = [
   {
-    provide: UserCommandRepository,
-    useClass: PgUserCommandRepository,
+    provide: UserRepository,
+    useClass: PgUserRepository,
   },
   {
-    provide: VerificationCommandRepository,
-    useClass: PgVerificationCommandRepository,
+    provide: VerificationRepository,
+    useClass: PgVerificationRepository,
   },
 ];
 

@@ -5,7 +5,7 @@ import {
   type VerificationType,
 } from '@identity-domain/verification/aggregates/base-verification.entity';
 
-export abstract class VerificationCommandRepository {
+export abstract class VerificationRepository {
   public abstract findByUserId(
     userId: AggregateId,
     type: VerificationType,

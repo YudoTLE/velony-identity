@@ -6,12 +6,12 @@ import {
   type VerificationEntity,
   type VerificationType,
 } from '@identity-domain/verification/aggregates/base-verification.entity';
-import { VerificationCommandRepository } from '@identity-domain/verification/repositories/verification.command.repository';
-import { PgVerificationCommandMapper } from '@identity-infrastructure/persistence/pg/mappers/pg-verification.command.mapper';
+import { VerificationRepository } from '@identity-domain/verification/repositories/verification.repository';
+import { PgVerificationMapper } from '@identity-infrastructure/persistence/pg/mappers/pg-verification.mapper';
 import { PgService } from '@identity-infrastructure/persistence/pg/pg.service';
 
 @Injectable()
-export class PgVerificationCommandRepository implements VerificationCommandRepository {
+export class PgVerificationRepository implements VerificationRepository {
   public constructor(private readonly pgService: PgService) {}
 
   public async findByUserId(
@@ -44,11 +44,11 @@ export class PgVerificationCommandRepository implements VerificationCommandRepos
     );
     if (!result.rows.at(0)) return null;
 
-    return PgVerificationCommandMapper.toEntity(result.rows[0].verification);
+    return PgVerificationMapper.toEntity(result.rows[0].verification);
   }
 
   public async save(entity: VerificationEntity): Promise<void> {
-    const data = PgVerificationCommandMapper.toPersistence(entity);
+    const data = PgVerificationMapper.toPersistence(entity);
 
     await this.pgService.query(
       `
