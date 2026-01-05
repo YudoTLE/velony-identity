@@ -1,3 +1,4 @@
+import { isTimeString } from '@velony/utils';
 import { Transform } from 'class-transformer';
 import {
   IsEmail,
@@ -11,8 +12,6 @@ import {
   ValidatorConstraint,
 } from 'class-validator';
 import { type ValidatorConstraintInterface } from 'class-validator';
-
-import { isTimeString } from '@common/utils/time.util';
 
 @ValidatorConstraint({ name: 'isTimeString', async: false })
 export class IsTimeString implements ValidatorConstraintInterface {

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { convertTime } from '@velony/utils';
 
 import { TypedConfigService } from '@config/typed-config.service';
 
@@ -7,7 +8,6 @@ import { ExpiredAccessTokenException } from '@common/exceptions/expired-access-t
 import { ExpiredRefreshTokenException } from '@common/exceptions/expired-refresh-token.exception';
 import { InvalidAccessTokenException } from '@common/exceptions/invalid-access-token.exception';
 import { InvalidRefreshTokenException } from '@common/exceptions/invalid-refresh-token.exception';
-import { convertTime } from '@common/utils/time.util';
 
 import {
   type AccessTokenPayload,

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { convertTime } from '@velony/utils';
 import { type Request, type Response } from 'express';
 
 import { TypedConfigService } from '@config/typed-config.service';
@@ -6,7 +7,6 @@ import { TypedConfigService } from '@config/typed-config.service';
 import { MissingAccessTokenException } from '@common/exceptions/missing-access-token.exception';
 import { MissingRefreshTokenException } from '@common/exceptions/missing-refresh-token.exception';
 import { CookieService } from '@common/services/cookie.service';
-import { convertTime } from '@common/utils/time.util';
 
 export const ACCESS_TOKEN_COOKIE = 'access_token';
 export const REFRESH_TOKEN_COOKIE = 'refresh_token';
